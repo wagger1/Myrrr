@@ -16,24 +16,25 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #=========================================================================
 
-from .info import * 
 from pymongo import MongoClient
+from .info import DATABASE_URI
 
 dbclient = MongoClient(DATABASE_URI)
-db       = dbclient["Auto-Delete"]
-col      = db["DATA"]
+db = dbclient["Auto-Delete"]
+col = db["DATA"]
+col.create_index("time")
 
-def save_message(message, time):
-    data = {"chat_id": message.chat.id,
-            "message_id": message.id,
-            "time": time}
+def save_message(message, expire_at):
+    data = {
+        "chat_id": message.chat.id,
+        "message_id": message.id,
+        "time": expire_at
+    }
     col.insert_one(data)
-   
-def get_all_data(time):
-    data     = {"time":{"$lte":time}}
-    all_data = list(col.find(data))
-    return all_data
 
-def delete_all_data(all_data):
-    for data in all_data:
-        col.delete_one(data)
+def get_all_data(current_time):
+    return list(col.find({"time": {"$lte": current_time}}))
+
+def delete_all_data(records):
+    for data in records:
+        col.delete_one({"_id": data["_id"]})
