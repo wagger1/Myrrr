@@ -24,6 +24,4 @@ BLACK_LIST = parse_int_list("BLACK_LIST", "")
 DATABASE_URI = os.environ.get("DATABASE_URI", "")
 PORT = os.environ.get("PORT", "8080")
 
-# Validate required variables
-if not all([API_ID, API_HASH, SESSION, DATABASE_URI]) or not CHATS:
-    raise ValueError("Missing required environment variables: API_ID, API_HASH, SESSION, DATABASE_URI, CHATS")
+
