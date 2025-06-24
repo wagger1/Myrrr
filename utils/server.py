@@ -21,8 +21,8 @@ from flask import Flask
 app = Flask(__name__)
 
 @app.route("/")
-def route():
+async def route():
     return "<h1>Check <a href='https://github.com/arun017s/AutoDelete'>AutoDelete</a></h1>"
 
 if __name__ == "__main__":     
-   app.run(host="0.0.0.0", port=8080)
+   app.run()

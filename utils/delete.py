@@ -16,43 +16,36 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #=========================================================================
 
-import asyncio
-from time import time
-from collections import defaultdict
-from .info import *
-from .database import get_all_data, delete_all_data
-from pyrogram import Client
-import logging
+import asyncio 
+from .info import * 
+from time import time 
+from .database import *
+from pyrogram import Client, idle 
+#-------------------------------------------------------------------------------
+bot = Client("auto-delete-bot",
+          api_id=API_ID,
+          api_hash=API_HASH,
+          bot_token=BOT_TOKEN)
+#-------------------------------------------------------------------------------
 
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger("AutoDelete")
-
-bot = Client("auto-delete-bot", api_id=API_ID, api_hash=API_HASH, bot_token=BOT_TOKEN)
-
-async def check_up(bot):
-    now = int(time())
-    due_messages = get_all_data(now)
-
-    grouped = defaultdict(list)
-    for msg in due_messages:
-        grouped[msg["chat_id"]].append((msg["message_id"], msg["_id"]))
-
-    for chat_id, messages in grouped.items():
-        for i in range(0, len(messages), 100):
-            batch = messages[i:i + 100]
-            message_ids = [m[0] for m in batch]
-            try:
-                await bot.delete_messages(chat_id=chat_id, message_ids=message_ids)
-            except Exception as e:
-                logger.warning(f"Failed to delete messages in chat {chat_id}: {e}")
-
-    delete_all_data(due_messages)
+async def check_up(bot):   
+    _time = int(time()) 
+    all_data = get_all_data(_time)
+    for data in all_data:
+        try:
+           await bot.delete_messages(chat_id=data["chat_id"],
+                               message_ids=data["message_id"])           
+        except Exception as e:
+           err=data
+           err["Error"]=str(e)
+           print(err)
+    delete_all_data(all_data)
 
 async def run_check_up():
-    async with bot:
-        while True:
-            await check_up(bot)
-            await asyncio.sleep(10)  # Every 10 seconds
-
-if __name__ == "__main__":
-    asyncio.run(run_check_up())
+    async with bot:     
+        while True:  
+           await check_up(bot)
+           await asyncio.sleep(1)
+    
+if __name__=="__main__":   
+   asyncio.run(run_check_up())
