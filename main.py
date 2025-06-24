@@ -21,6 +21,7 @@ from utils.info import *
 from utils.database import *
 from subprocess import Popen
 from pyrogram import Client, filters
+from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
 User = Client("auto-delete-user",
               session_string=SESSION)
@@ -39,9 +40,12 @@ async def delete(user, message):
     except Exception as e:
        print(str(e))
 
-@User.on_message(filters.regex("!start") & filters.private)
+@User.on_message(filters.regex("start") & filters.private)
 async def start(user, message):
-    await message.reply("Hi, I'm alive!")
+    buttons = InlineKeyboardMarkup(
+        [[InlineKeyboardButton("hai", url="https://t.me/CinemaXpressGroup")]]
+    )
+    await message.reply("Hi, I'm alive!", reply_markup=buttons)
 
 #==========================================================
 
