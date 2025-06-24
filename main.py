@@ -39,8 +39,8 @@ async def delete(user, message):
        save_message(message, _time)
     except Exception as e:
        print(str(e))
-
-@User.on_message(filters.regex("start") & filters.private)
+      
+@Bot.on_message(filters.command("start") & filters.private)
 async def start(user, message):
     buttons = InlineKeyboardMarkup(
         [[InlineKeyboardButton("hai", url="https://t.me/CinemaXpressGroup")]]
