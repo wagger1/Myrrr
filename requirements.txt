@@ -4,4 +4,3 @@ requests
 gunicorn
 pymongo[srv]
 flask[async] 
-python-dotenv

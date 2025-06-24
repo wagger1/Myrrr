@@ -16,38 +16,34 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #=========================================================================
 
-from time import time
+from time import time 
 from utils.info import *
-from utils.database import save_message
+from utils.database import *
 from subprocess import Popen
 from pyrogram import Client, filters
-import logging
-from pyrogram import utils as pyroutils
 
-pyroutils.MIN_CHAT_ID = -999999999999
-pyroutils.MIN_CHANNEL_ID = -100999999999999
-
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
-
-User = Client("auto-delete-user", session_string=SESSION)
+User = Client("auto-delete-user",
+              session_string=SESSION)
 
 @User.on_message(filters.chat(CHATS))
 async def delete(user, message):
     try:
-        if message.from_user:
-            if WHITE_LIST and message.from_user.id not in WHITE_LIST:
-                return
-            if BLACK_LIST and message.from_user.id in BLACK_LIST:
-                return
-        expire_time = int(time()) + TIME
-        save_message(message, expire_time)
+       if bool(WHITE_LIST):
+          if message.from_user.id in WHITE_LIST:
+             return 
+       if bool(BLACK_LIST):
+          if message.from_user.id not in BLACK_LIST:
+             return
+       _time = int(time()) + TIME 
+       save_message(message, _time)
     except Exception as e:
-        logger.exception("Error in message handler: %s", e)
+       print(str(e))
 
 @User.on_message(filters.regex("!start") & filters.private)
 async def start(user, message):
     await message.reply("Hi, I'm alive!")
+
+#==========================================================
 
 Popen(f"gunicorn utils.server:app --bind 0.0.0.0:{PORT}", shell=True)
 Popen("python3 -m utils.delete", shell=True)
